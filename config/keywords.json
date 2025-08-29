@@ -1,0 +1,165 @@
+{
+  "requirement_keywords": [
+    "기능", "요구사항", "사용자", "시스템", "화면", "페이지", "버튼",
+    "클릭", "선택", "입력", "검색", "필터", "정렬", "스크롤",
+    "로그인", "회원가입", "로그아웃", "프로필", "설정", "알림",
+    "목록", "리스트", "카드", "메뉴", "탭", "모달", "팝업",
+    "등록", "수정", "삭제", "추가", "업데이트", "동기화",
+    "거래", "주문", "보유", "자산", "포트폴리오", "접근성", "표시", "대기",
+    "자산관리", "잔고", "잔액", "총자산", "수익률", "계좌", "지갑",
+    "입금", "출금", "이체", "매수", "매도", "체결", "미체결", "취소",
+    "차트", "그래프", "통계", "분석", "리포트", "히스토리", "거래내역",
+    "대시보드", "새로고침", "실시간", "진행중", "완료", "실패", "승인",
+    "출금한도", "한도", "인증", "검증", "보호", "손실", "평균", "단가",
+    "수익", "자동매수", "주소록", "주소", "확인", "네트워크", "블록체인",
+    "시스템점검", "점검", "내역", "포지션", "손익", "실현", "보류",
+    "상태", "유지보수", "전환", "거래정지", "무기한", "스왑", "트리거",
+    "실행", "대기중", "부족", "한계", "제한", "활성화", "업그레이드",
+    
+    "login", "signup", "setting", "search", "filter", "sort", "upload", "download",
+    "button", "click", "tap", "swipe", "scroll",
+    "spot", "holdings", "accessibility", "display", "pending",
+    "wallet", "transfer", "buy", "sell", "trade",
+    "exchange", "swap", "profit", "loss", "chart", "graph", "analytics",
+    "report", "dashboard", "refresh", "realtime", "processing",
+    "funds", "available", "APR", "withdraw", "limit", "verification",
+    "protection", "average", "cost", "recurring", "book",
+    "confirm", "blockchain", "maintenance", "cancel", "status", "convertible", "tradable", "insufficient",
+    "icon", "media", "radio", "document",
+    "container", "collapse", "detail", "trend", "mini", "graphic",
+    "boosted", "protected", "effective", "contracts", "trigger",
+    "execution", "awaiting", "perpetual", "activate", "upgrades",
+    "instantly", "additionally", "tradeable", "non-tradable",
+    
+    "market order", "trigger order", "order preview", "order confirmation", "order form",
+    "trade settings", "available funds", "schedule order", "trigger time",
+    "cancel order", "unrealized p&l", "take profit", "stop loss", "close position",
+    "estimated total value", "funding fee", "funding payment", "auto-deleveraging",
+    "trading limit tier", "perpetual swap", "picture-in-picture", "order value", "max order value",
+    "leverage", "multi-position mode", "open positions", "view holdings", "latest trade", "top traders",
+    
+    "tab", "PnL", "funding", "trending", "favorites",
+    "volume", "symbol", "banner", "badge", "calendar",
+    "long", "short", "perp", "market", "trading",
+    
+    "feed", "news", "insights", "crypto", "price",
+    "schedule", "vip", "vipstatus",
+    "social", "events", "economic", "government", "user", "menu",
+    
+    "stake", "staked", "pool", "rewards",
+    "earnings", "launchpool", "convert", "auction",
+    "sparks", "reward", "flipster", "pixel", "ton",
+    
+    "claimed", "hub", "bonus", "promotion", "promotions", "tasks",
+    "complete", "completed", "learn", "identity", "first", "referee",
+    "referral", "link",
+    
+    "notifications", "liquidation", "liquidated",
+    "system", "notified", "alerts",
+    "action", "announcement", "currency", "warning",
+    "reached", "initial", "avoid", "successful", "amount", "application",
+    "경우", "특정", "모든",
+    
+    "program", "league", "tier", "level", "benefits",
+    "day", "time", "share", "empty",
+    "secondary", "choice", "my", "basic", "logomark", "cropped",
+    
+    "log", "password", "email", "input", "hint",
+    "placeholder", "checkbox", "terms", "privacy", "notice",
+    "create", "code", "zero", "fast", "pairs", "data",
+    "services", "sso", "body", "title"
+  ],
+  
+  "exclude_keywords": [
+    "px", "pt", "rem", "color", "font", "weight", "size",
+    "margin", "padding", "border", "shadow", "opacity",
+    "rgba", "hex", "#", "auto", "none", "inherit",
+    "absolute", "relative", "fixed", "static"
+  ],
+  
+  "ui_patterns": {
+    "navigation": {
+      "keywords": ["nav", "menu", "tab", "breadcrumb", "back", "next", "home", "drawer"],
+      "flow_type": "navigation",
+      "priority": "P1"
+    },
+    "authentication": {
+      "keywords": ["login", "signup", "register", "signin", "oauth", "auth", "password", "biometric"],
+      "flow_type": "auth_flow",
+      "priority": "P1"
+    },
+    "form_input": {
+      "keywords": ["input", "field", "form", "textfield", "submit", "save", "cancel", "validation"],
+      "flow_type": "form_interaction",
+      "priority": "P1"
+    },
+    "modal_popup": {
+      "keywords": ["modal", "popup", "dialog", "overlay", "confirm", "alert", "tooltip"],
+      "flow_type": "modal_flow",
+      "priority": "P2"
+    },
+    "transaction": {
+      "keywords": ["buy", "sell", "trade", "order", "payment", "checkout", "confirm", "wallet"],
+      "flow_type": "transaction_flow",
+      "priority": "P1"
+    },
+    "social": {
+      "keywords": ["share", "like", "follow", "comment", "social", "connect", "invite"],
+      "flow_type": "social_interaction",
+      "priority": "P2"
+    },
+    "settings": {
+      "keywords": ["settings", "preferences", "profile", "account", "config", "privacy"],
+      "flow_type": "settings_flow",
+      "priority": "P2"
+    },
+    "search_filter": {
+      "keywords": ["search", "filter", "sort", "category", "tag", "query"],
+      "flow_type": "search_flow",
+      "priority": "P2"
+    }
+  },
+  
+  "flow_patterns": {
+    "onboarding": {
+      "keywords": ["welcome", "intro", "tutorial", "getting started", "setup", "walkthrough"],
+      "confidence_multiplier": 25
+    },
+    "purchasing": {
+      "keywords": ["add to cart", "checkout", "payment", "order", "buy", "purchase"],
+      "confidence_multiplier": 25
+    },
+    "registration": {
+      "keywords": ["sign up", "register", "create account", "join", "new user"],
+      "confidence_multiplier": 25
+    },
+    "verification": {
+      "keywords": ["verify", "confirm", "validate", "check", "code", "otp"],
+      "confidence_multiplier": 25
+    },
+    "error_handling": {
+      "keywords": ["error", "failed", "retry", "oops", "something went wrong", "try again"],
+      "confidence_multiplier": 20
+    },
+    "success": {
+      "keywords": ["success", "complete", "done", "congratulations", "thank you", "finished"],
+      "confidence_multiplier": 30
+    }
+  },
+  
+  "crypto_specific": {
+    "trading_keywords": [
+      "spot", "futures", "perpetual", "leverage", "margin",
+      "long", "short", "pnl", "funding", "liquidation",
+      "orderbook", "depth", "volume", "market cap"
+    ],
+    "wallet_keywords": [
+      "deposit", "withdraw", "transfer", "balance", "asset",
+      "portfolio", "holdings", "staking", "yield", "rewards"
+    ],
+    "security_keywords": [
+      "2fa", "kyc", "aml", "whitelist", "blacklist",
+      "cold storage", "hot wallet", "private key", "seed phrase"
+    ]
+  }
+}

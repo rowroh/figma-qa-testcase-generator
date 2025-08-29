@@ -1,0 +1,25 @@
+# Figma API 설정
+FIGMA_TOKEN=your_figma_personal_access_token_here
+
+# 테스트케이스 생성 설정
+DEFAULT_PRIORITY=P2
+DEFAULT_TEST_TYPE=Functional
+DEFAULT_DOMAIN=app
+
+# 출력 설정
+DEFAULT_OUTPUT_FORMAT=excel
+DEFAULT_OUTPUT_DIR=output
+
+# 분석 설정
+ENABLE_SCREENSHOT_ANALYSIS=true
+ENABLE_ENHANCED_KEYWORDS=true
+MAX_KEYWORD_LENGTH=1000
+MIN_KEYWORD_LENGTH=3
+
+# 성능 설정
+REQUEST_TIMEOUT=30
+MAX_RETRY_ATTEMPTS=3
+
+# 로깅 설정
+LOG_LEVEL=INFO
+LOG_FILE=logs/figma_qa_generator.log

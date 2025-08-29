@@ -1,0 +1,31 @@
+# 개발 의존성
+# 테스트
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-mock>=3.10.0
+pytest-asyncio>=0.21.0
+
+# 코드 품질
+black>=22.0.0
+flake8>=5.0.0
+mypy>=0.950
+isort>=5.12.0
+bandit>=1.7.0
+
+# 문서화
+sphinx>=4.0.0
+sphinx-rtd-theme>=1.0.0
+sphinx-autodoc-typehints>=1.19.0
+
+# 개발 도구
+pre-commit>=3.0.0
+jupyter>=1.0.0
+ipython>=8.0.0
+
+# 성능 분석
+memory-profiler>=0.60.0
+line-profiler>=4.0.0
+
+# 추가 도구
+python-dotenv>=0.19.0
+click>=8.0.0
