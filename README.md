@@ -60,6 +60,23 @@ echo "FIGMA_TOKEN=your_figma_token_here" >> .env
 
 ### **3. 기본 사용**
 
+#### **🚀 CLI 방식 (가장 간단)**
+
+```bash
+# 기본 Excel 출력
+python src/main.py "https://www.figma.com/design/your-figma-url"
+
+# TestRail 가져오기용 CSV
+python src/main.py "https://figma.com/design/your-url" \
+  --format testrail --output "testrail_import.csv"
+
+# P1 우선순위만 생성
+python src/main.py "https://figma.com/design/your-url" \
+  --priority P1 --verbose
+```
+
+#### **🔧 Python API 방식**
+
 ```python
 from src.analyzers.figma_analyzer import FigmaAnalyzer
 from src.generators.testcase_generator import TestCaseGenerator
@@ -79,6 +96,9 @@ generator.save_to_excel(testcases, "output/testcases.xlsx")
 ---
 
 ## 📖 **사용법**
+
+> **💡 완전한 사용법 가이드: [docs/USER_GUIDE.md](docs/USER_GUIDE.md)**  
+> **🚀 빠른 데모: `python quick_demo.py`**
 
 ### **🔍 Figma 분석하기**
 
