@@ -148,3 +148,5 @@ test_output/
 *.xlsx
 *.csv
 !examples/output_samples/*.xlsx
+!templates/*.xlsx
+

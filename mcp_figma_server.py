@@ -400,9 +400,16 @@ class FigmaMCPServer:
         """X Oauth.xlsx 템플릿을 사용하여 저장"""
         import openpyxl
         from openpyxl.styles import Font, PatternFill
+        try:
+            # repo 구조에서 룰 설정을 재사용 (없으면 동작에 영향 없도록 예외 처리)
+            from src.utils.rules_config import load_rules_config, normalize_testcase_fields  # type: ignore
+            rules = load_rules_config()
+        except Exception:
+            rules = None
+            normalize_testcase_fields = None  # type: ignore
         
-        # 템플릿 파일 경로
-        template_path = "X Oauth.xlsx"
+        # 템플릿 파일 경로 (우선순위: web/app 템플릿 -> 기존 X Oauth.xlsx)
+        template_path = os.path.join("templates", "QA_Testcase_Template_WebApp.xlsx")
         
         try:
             # 템플릿 파일 복사
@@ -414,82 +421,127 @@ class FigmaMCPServer:
                 for col in range(1, ws.max_column + 1):
                     ws.cell(row=row, column=col).value = None
             
-            # X Oauth.xlsx 템플릿 컬럼 매핑
-            template_columns = {
-                'domain': 'A',
-                'section': 'B', 
-                'Component': 'C',
-                'Feature': 'D',
-                'title': 'E',
-                'precondition': 'F',
-                'Test step': 'G',
-                'Expected-results': 'H',
-                'Priority': 'I',
-                'type': 'J',
-                'comment': 'K',
-                'android Result': 'L',
-                'ios Result': 'M'
+            def _norm_header(s: str) -> str:
+                return "".join(ch for ch in (s or "").strip().lower() if ch.isalnum())
+
+            def _infer_template_columns(worksheet) -> dict:
+                """
+                템플릿 헤더(1행)를 기반으로 컬럼 매핑을 동적으로 추론.
+                - 기존 템플릿(android/ios) + 신규 템플릿(web/app) 모두 지원
+                """
+                header_row = 1
+                inferred = {}
+                for col in range(1, worksheet.max_column + 1):
+                    header_val = worksheet.cell(row=header_row, column=col).value
+                    if not header_val:
+                        continue
+                    key = _norm_header(str(header_val))
+                    inferred[key] = openpyxl.utils.get_column_letter(col)
+                return inferred
+
+            inferred_headers = _infer_template_columns(ws)
+
+            # fallback: 기존 X Oauth.xlsx 템플릿 컬럼 매핑
+            fallback_columns = {
+                "domain": "A",
+                "section": "B",
+                "component": "C",
+                "feature": "D",
+                "title": "E",
+                "precondition": "F",
+                "teststep": "G",
+                "expectedresults": "H",
+                "priority": "I",
+                "type": "J",
+                "comment": "K",
+                "androidresult": "L",
+                "iosresult": "M",
             }
             
             # 데이터 매핑 및 변환
             converted_cases = []
             for i, case in enumerate(test_cases):
                 converted_case = self._convert_to_template_format(case, i)
+                # 룰세팅 alias 정규화 (test_steps->test_step, android/ios->app_result 등)
+                if rules and normalize_testcase_fields:
+                    converted_case = normalize_testcase_fields(converted_case, rules.field_aliases)
                 converted_cases.append(converted_case)
             
             # 데이터 입력
             for row_idx, case in enumerate(converted_cases, start=2):
-                # domain (Social Referral v2로 고정)
-                ws[f'A{row_idx}'].value = "Social Referral v2"
-                ws[f'A{row_idx}'].font = Font(name='맑은 고딕')
+                # 헤더 기반 매핑 우선, 없으면 fallback 사용
+                col_domain = inferred_headers.get("domain", fallback_columns["domain"])
+                col_section = inferred_headers.get("section", fallback_columns["section"])
+                col_component = inferred_headers.get("component", inferred_headers.get("component", fallback_columns["component"]))
+                col_feature = inferred_headers.get("feature", fallback_columns["feature"])
+                col_title = inferred_headers.get("title", fallback_columns["title"])
+                col_precondition = inferred_headers.get("precondition", fallback_columns["precondition"])
+                col_test_step = inferred_headers.get("teststep", fallback_columns["teststep"])
+                col_expected = inferred_headers.get("expectedresults", fallback_columns["expectedresults"])
+                col_priority = inferred_headers.get("priority", fallback_columns["priority"])
+                col_type = inferred_headers.get("type", fallback_columns["type"])
+                col_comment = inferred_headers.get("comment", fallback_columns["comment"])
+                col_web_result = inferred_headers.get("webresult")
+                col_app_result = inferred_headers.get("appresult")
+                col_android = inferred_headers.get("androidresult", fallback_columns["androidresult"])
+                col_ios = inferred_headers.get("iosresult", fallback_columns["iosresult"])
+
+                # domain
+                ws[f'{col_domain}{row_idx}'].value = case.get('domain', '') or ""
+                ws[f'{col_domain}{row_idx}'].font = Font(name='맑은 고딕')
                 
                 # section (플로우 타입)
-                ws[f'B{row_idx}'].value = case.get('section', 'Referral Flow')
-                ws[f'B{row_idx}'].font = Font(name='맑은 고딕')
+                ws[f'{col_section}{row_idx}'].value = case.get('section', '')
+                ws[f'{col_section}{row_idx}'].font = Font(name='맑은 고딕')
                 
                 # Component (스크린 정보)
-                ws[f'C{row_idx}'].value = case.get('component', 'UI Component')
-                ws[f'C{row_idx}'].font = Font(name='맑은 고딕')
+                ws[f'{col_component}{row_idx}'].value = case.get('component', '')
+                ws[f'{col_component}{row_idx}'].font = Font(name='맑은 고딕')
                 
                 # Feature (기능)
-                ws[f'D{row_idx}'].value = case.get('feature', 'Core Feature')
-                ws[f'D{row_idx}'].font = Font(name='맑은 고딕')
+                ws[f'{col_feature}{row_idx}'].value = case.get('feature', '')
+                ws[f'{col_feature}{row_idx}'].font = Font(name='맑은 고딕')
                 
                 # title (제목)
-                ws[f'E{row_idx}'].value = case.get('title', '')
-                ws[f'E{row_idx}'].font = Font(name='맑은 고딕')
+                ws[f'{col_title}{row_idx}'].value = case.get('title', '')
+                ws[f'{col_title}{row_idx}'].font = Font(name='맑은 고딕')
                 
                 # precondition (사전조건)
-                ws[f'F{row_idx}'].value = case.get('precondition', '')
-                ws[f'F{row_idx}'].font = Font(name='맑은 고딕')
+                ws[f'{col_precondition}{row_idx}'].value = case.get('precondition', '')
+                ws[f'{col_precondition}{row_idx}'].font = Font(name='맑은 고딕')
                 
                 # Test step (테스트 절차)
-                ws[f'G{row_idx}'].value = case.get('test_step', '')
-                ws[f'G{row_idx}'].font = Font(name='맑은 고딕')
+                ws[f'{col_test_step}{row_idx}'].value = case.get('test_step', case.get('test_steps', ''))
+                ws[f'{col_test_step}{row_idx}'].font = Font(name='맑은 고딕')
                 
                 # Expected-results (기대 결과)
-                ws[f'H{row_idx}'].value = case.get('expected_results', '')
-                ws[f'H{row_idx}'].font = Font(name='맑은 고딕')
+                ws[f'{col_expected}{row_idx}'].value = case.get('expected_results', '')
+                ws[f'{col_expected}{row_idx}'].font = Font(name='맑은 고딕')
                 
                 # Priority (우선순위)
-                ws[f'I{row_idx}'].value = case.get('priority', 'P2')
-                ws[f'I{row_idx}'].font = Font(name='맑은 고딕')
+                ws[f'{col_priority}{row_idx}'].value = case.get('priority', 'P2')
+                ws[f'{col_priority}{row_idx}'].font = Font(name='맑은 고딕')
                 
                 # type (테스트 타입)
-                ws[f'J{row_idx}'].value = case.get('type', 'Functional')
-                ws[f'J{row_idx}'].font = Font(name='맑은 고딕')
+                ws[f'{col_type}{row_idx}'].value = case.get('type', 'Functional')
+                ws[f'{col_type}{row_idx}'].font = Font(name='맑은 고딕')
                 
                 # comment (비고)
-                ws[f'K{row_idx}'].value = case.get('comment', '')
-                ws[f'K{row_idx}'].font = Font(name='맑은 고딕')
-                
-                # android Result (결과는 비워둠)
-                ws[f'L{row_idx}'].value = ''
-                ws[f'L{row_idx}'].font = Font(name='맑은 고딕')
-                
-                # ios Result (결과는 비워둠)
-                ws[f'M{row_idx}'].value = ''
-                ws[f'M{row_idx}'].font = Font(name='맑은 고딕')
+                ws[f'{col_comment}{row_idx}'].value = case.get('comment', '')
+                ws[f'{col_comment}{row_idx}'].font = Font(name='맑은 고딕')
+
+                # 결과 컬럼 (web/app이 있으면 우선 채우고, 없으면 android/ios 템플릿 대응)
+                if col_web_result:
+                    ws[f'{col_web_result}{row_idx}'].value = case.get('web_result', '')
+                    ws[f'{col_web_result}{row_idx}'].font = Font(name='맑은 고딕')
+                if col_app_result:
+                    ws[f'{col_app_result}{row_idx}'].value = case.get('app_result', '')
+                    ws[f'{col_app_result}{row_idx}'].font = Font(name='맑은 고딕')
+                else:
+                    ws[f'{col_android}{row_idx}'].value = ''
+                    ws[f'{col_android}{row_idx}'].font = Font(name='맑은 고딕')
+                    ws[f'{col_ios}{row_idx}'].value = ''
+                    ws[f'{col_ios}{row_idx}'].font = Font(name='맑은 고딕')
             
             # 파일 저장
             wb.save(filename)
@@ -503,8 +555,14 @@ class FigmaMCPServer:
             }
             
         except FileNotFoundError:
-            # 템플릿 파일이 없으면 기본 형식으로 저장
-            return self._save_basic_excel(test_cases, filename)
+            # 신규 템플릿이 없으면 기존 템플릿(X Oauth.xlsx) 시도, 그것도 없으면 기본 형식으로 저장
+            try:
+                template_path = "X Oauth.xlsx"
+                wb = openpyxl.load_workbook(template_path)
+                wb.close()
+                return self._save_with_template(test_cases, filename)
+            except Exception:
+                return self._save_basic_excel(test_cases, filename)
         except Exception as e:
             return {
                 "success": False,

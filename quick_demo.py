@@ -25,16 +25,17 @@ def check_requirements():
         print(f"✅ Python {python_version.major}.{python_version.minor}.{python_version.micro}")
     
     # 2. 필수 패키지 확인
-    required_packages = ['requests', 'pandas', 'openpyxl', 'python-dotenv']
+    required_packages = ['requests', 'pandas', 'openpyxl', 'dotenv']
+    package_names = ['requests', 'pandas', 'openpyxl', 'python-dotenv']
     missing_packages = []
     
-    for package in required_packages:
+    for package, display_name in zip(required_packages, package_names):
         try:
-            __import__(package.replace('-', '_'))
-            print(f"✅ {package}")
+            __import__(package)
+            print(f"✅ {display_name}")
         except ImportError:
-            missing_packages.append(package)
-            print(f"❌ {package} (미설치)")
+            missing_packages.append(display_name)
+            print(f"❌ {display_name} (미설치)")
     
     if missing_packages:
         print(f"\n💡 설치 방법:")
@@ -46,13 +47,13 @@ def check_requirements():
     figma_token = os.getenv("FIGMA_TOKEN")
     
     if not figma_token or figma_token == "your_figma_personal_access_token_here":
-        print("❌ FIGMA_TOKEN 환경변수 설정 필요")
+        print("⚠️ FIGMA_TOKEN 환경변수 설정 필요")
         print("\n🔑 Figma 토큰 설정 방법:")
         print("1. https://www.figma.com/settings 접속")
         print("2. 'Personal access tokens' 섹션")
         print("3. 'Create new token' 클릭")
         print("4. .env 파일에 FIGMA_TOKEN=your_token 추가")
-        return False
+        print("\n💡 토큰 없이도 데모는 계속 진행됩니다!")
     else:
         print(f"✅ FIGMA_TOKEN 설정됨 (길이: {len(figma_token)})")
     

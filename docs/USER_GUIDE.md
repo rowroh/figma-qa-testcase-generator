@@ -314,6 +314,98 @@ python src/main.py "https://figma.com/design/web-app" \
 
 ## ⚙️ 설정 및 커스터마이징
 
+### ✅ 룰세팅(템플릿/우선순위/커버리지) 적용
+
+이 도구는 **룰세팅 파일**을 통해 테스트케이스 컬럼 스키마와 작성 원칙을 고정할 수 있습니다.
+
+- 기본 경로: `config/rules_config.json`
+- 주요 내용:
+  - **출력 템플릿 컬럼**: `domain, section, component, feature, title, precondition, test_step, expected_results, priority, type, comment, web_result, app_result`
+  - **우선순위 룰**: 키워드 기반 P1/P2/P3/P4 매핑 기본값
+  - **커버리지 룰**: 접근성/사용성/네거티브/엣지/크로스플랫폼 대표 케이스 자동 보강
+  - **유저플로우 불명확 시 질문**: 신뢰도 낮으면 확인 질문 출력 옵션 제공
+
+#### CLI에서 룰세팅 지정
+
+```bash
+python src/main.py "https://figma.com/design/project-url" \
+  --rules "config/rules_config.json" \
+  --show-flow-questions \
+  --output "output/testcases.xlsx" \
+  --verbose
+```
+
+### 🧾 출력 템플릿(엑셀 헤더)
+
+기본 제공 템플릿:
+- `templates/QA_Testcase_Template_WebApp.xlsx`
+
+헤더 컬럼:
+- `domain, section, component, feature, title, precondition, test_step, expected_results, priority, type, comment, web_result, app_result`
+
+`web_result` / `app_result`는 **실행 결과 기록용 컬럼(빈 값)** 으로, 생성 시에는 비워두고 테스트 수행 후 채웁니다.
+
+---
+
+## ✅ 실행 결과 기록 규칙 (web_result / app_result)
+
+테스트케이스 실행 후 `web_result` / `app_result` 컬럼은 **아래 규칙으로 일관되게** 채웁니다.
+
+### ## 1) 기본 포맷 (권장)
+
+- **Pass** / **Fail** / **Blocked** / **N/A** 중 하나로 시작
+- 뒤에는 `|`로 구분하여 필요한 정보를 추가
+
+권장 포맷:
+- `Pass`
+- `Fail | BUG-1234 | 실제: ... | 기대: ...`
+- `Blocked | ENV | 로그인 불가(서버 500)`
+- `N/A | 이번 스코프 제외`
+
+### ## 2) 상태값 정의
+
+- **Pass**: 기대 결과와 동일하게 동작함
+- **Fail**: 기대 결과와 다르게 동작함(결함)
+- **Blocked**: 환경/데이터/권한/정책 등으로 테스트를 수행할 수 없음
+- **N/A**: 플랫폼 미지원/스코프 제외/요구사항 부재로 테스트 대상이 아님
+
+### ## 3) Fail 기록 시 필수 항목
+
+Fail일 때는 최소 아래 3가지를 포함해 주세요.
+
+- **버그 키/링크**: 예) `BUG-1234` (또는 Jira/Linear 링크)
+- **실제 결과(Actual)**: 사용자 관점으로 짧고 명확하게
+- **기대 결과(Expected)**: 테스트케이스의 expected_results와 동일/요약
+
+예시:
+- `Fail | BUG-2481 | 실제: '정산' 버튼 탭 시 무반응 | 기대: 정산 상세로 이동`
+
+### ## 4) Blocked 기록 시 권장 항목
+
+- **Blocked 원인 유형** 중 하나를 먼저 적고, 구체 사유를 덧붙입니다.
+  - `ENV`(환경/서버/빌드 문제)
+  - `DATA`(테스트 데이터 부족)
+  - `ACCESS`(권한/계정 문제)
+  - `POLICY`(규제/정책 제한, 예: VARA)
+
+예시:
+- `Blocked | DATA | 마스터 계정/복사기 3명 구성이 없어 검증 불가`
+
+### ## 5) Web vs App 기록 가이드
+
+- **web_result**: Web(브라우저) 실행 결과를 기록
+- **app_result**: iOS+Android 결과를 **통합**하여 기록
+  - 두 플랫폼 결과가 다르면 아래 형식 권장:
+    - `Fail | iOS: Pass | Android: Fail(BUG-1234)`
+
+### ## 6) 회귀/재검증(재테스트) 규칙 (권장)
+
+결함 수정 후 재테스트 시에는 기존 값을 덮어쓰기보다, 다음처럼 간단히 이력을 남기는 것을 권장합니다.
+
+- `Fail | BUG-1234 | (Re-test 12/23) Pass`
+
+
+
 ### 📄 환경변수 설정 (.env)
 
 ```bash
@@ -692,3 +784,4 @@ ls -la output/
 *마지막 업데이트: 2024년 8월 29일*  
 *버전: v1.0.0*  
 *GitHub: https://github.com/rowroh/figma-qa-testcase-generator*
+

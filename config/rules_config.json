@@ -1,0 +1,100 @@
+{
+  "version": "1.0.0",
+  "language": "ko",
+  "qa_rules": {
+    "persona": "거래소 담당 시니어 QA 엔지니어",
+    "principles": [
+      "피그마에 디자인된 신규 추가 영역 테스트케이스 설계",
+      "각 기능 단위 테스트케이스 설계",
+      "유저 플로우 시나리오 기반 테스트 설계",
+      "비즈니스 임팩트를 고려한 우선순위 설정",
+      "크로스 플랫폼 호환성 고려 (Web/iOS/Android)",
+      "접근성 및 사용성 테스트 포함",
+      "엣지 케이스 및 오류 상황 커버",
+      "유저플로우가 부정확/불명확한 경우 질문 생성",
+      "테스트케이스는 단순하고 명확하게 작성"
+    ]
+  },
+  "output_schema": {
+    "columns": [
+      "domain",
+      "section",
+      "component",
+      "feature",
+      "title",
+      "precondition",
+      "test_step",
+      "expected_results",
+      "priority",
+      "type",
+      "comment",
+      "web_result",
+      "app_result"
+    ],
+    "field_aliases": {
+      "test_steps": "test_step",
+      "Expected-results": "expected_results",
+      "Test step": "test_step",
+      "android_result": "app_result",
+      "ios_result": "app_result"
+    }
+  },
+  "priority_rules": {
+    "default": "P2",
+    "order": ["P1", "P2", "P3", "P4"],
+    "keywords": {
+      "P1": ["결제", "송금", "보안", "인증", "정산", "출금", "주문", "거래", "오류", "실패", "권한"],
+      "P2": ["조회", "목록", "필터", "정렬", "검색", "알림", "설정", "기본 동작"],
+      "P3": ["UI", "문구", "툴팁", "접근성", "사용성", "레이아웃", "성능"],
+      "P4": ["실험", "추천", "부가"]
+    }
+  },
+  "flow_clarification": {
+    "confidence_threshold": 0.55,
+    "default_questions": [
+      "대상 유저/역할은 누구인가요? (예: 복사기/마스터/Ops/관리자)",
+      "유저플로우 시작 지점과 진입 경로는 무엇인가요?",
+      "성공 조건(완료 기준)과 실패 조건(에러 처리)은 무엇인가요?",
+      "필수 사전조건(예: 로그인, KYC, 잔고, 권한)은 무엇인가요?",
+      "예외/정책(제한 국가/임계값/남용 등) 적용 조건이 있나요?"
+    ]
+  },
+  "coverage_rules": {
+    "always_include_categories": [
+      "Functional",
+      "UI",
+      "Accessibility",
+      "Usability",
+      "Negative",
+      "Edge"
+    ],
+    "platforms": ["web", "app"]
+  },
+  "excel_formula_output": {
+    "enabled": false,
+    "mode": "settlement_example",
+    "notes": "정산 도메인에서 예시 엑셀(수식 포함) 산출물이 필요할 때 enabled=true로 사용"
+  },
+  "result_recording_rules": {
+    "columns": {
+      "web": "web_result",
+      "app": "app_result"
+    },
+    "status_values": ["Pass", "Fail", "Blocked", "N/A"],
+    "recommended_formats": [
+      "Pass",
+      "Fail | BUG-1234 | 실제: ... | 기대: ...",
+      "Blocked | ENV | 로그인 불가(서버 500)",
+      "N/A | 이번 스코프 제외"
+    ],
+    "fail_required_fields": ["bug_key_or_link", "actual", "expected"],
+    "blocked_reason_types": ["ENV", "DATA", "ACCESS", "POLICY"],
+    "app_result_merge_guidance": [
+      "app_result는 iOS+Android 통합 기록",
+      "플랫폼별 결과가 다르면: Fail | iOS: Pass | Android: Fail(BUG-1234)"
+    ],
+    "retest_note_format_example": "Fail | BUG-1234 | (Re-test MM/DD) Pass"
+  }
+
+}
+

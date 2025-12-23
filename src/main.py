@@ -14,11 +14,19 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.analyzers.figma_analyzer import FigmaAnalyzer
 from src.generators.testcase_generator import TestCaseGenerator
+from src.utils.rules_config import DEFAULT_RULES_PATH
 
 def main():
     """메인 실행 함수"""
     # 환경변수 로드
-    load_dotenv()
+    # - Cursor/샌드박스 환경에서 .env가 ignore 처리되어 읽기 권한이 없을 수 있어 예외를 무시합니다.
+    try:
+        load_dotenv()
+    except PermissionError:
+        # .env를 읽을 수 없는 환경에서도 실행되도록 처리 (환경변수는 OS에서 직접 주입 가능)
+        pass
+    except OSError:
+        pass
     
     # 명령행 인자 파싱
     parser = argparse.ArgumentParser(description='Figma QA TestCase Generator')
@@ -35,6 +43,10 @@ def main():
                        help='스크린샷 분석 제외')
     parser.add_argument('--verbose', '-v', action='store_true',
                        help='상세 출력')
+    parser.add_argument('--rules', default=DEFAULT_RULES_PATH,
+                       help=f'룰/템플릿 설정 파일 경로 (기본값: {DEFAULT_RULES_PATH})')
+    parser.add_argument('--show-flow-questions', action='store_true',
+                       help='유저플로우 신뢰도가 낮으면 확인 질문을 출력')
     
     args = parser.parse_args()
     
@@ -77,7 +89,15 @@ def main():
         if args.verbose:
             print("📝 테스트케이스 생성 중...")
         
-        generator = TestCaseGenerator()
+        generator = TestCaseGenerator(rules_path=args.rules)
+
+        # 유저플로우가 불명확한 경우 질문 출력 (옵션)
+        if args.show_flow_questions:
+            questions = generator.get_flow_clarification_questions(result)
+            if questions:
+                print("\n❓ 유저플로우 확인이 필요합니다. 아래 질문에 답변해 주세요:")
+                for i, q in enumerate(questions, 1):
+                    print(f"  {i}. {q}")
         
         # 테스트케이스 생성
         if args.priority:
@@ -179,3 +199,4 @@ def print_testcase_statistics(testcases):
 
 if __name__ == "__main__":
     sys.exit(main())
+

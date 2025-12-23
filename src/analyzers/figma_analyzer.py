@@ -564,3 +564,4 @@ class FigmaAnalyzer:
             recommendations.append(f"UI 복잡도 변화: {complexity_change['from']} → {complexity_change['to']}")
         
         return recommendations
+
