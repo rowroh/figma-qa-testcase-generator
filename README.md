@@ -4,13 +4,23 @@
 
 Figma 디자인을 분석하여 실무 중심의 테스트케이스를 자동으로 생성하는 AI 기반 도구입니다.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
 
 ---
 
 ## 🌟 **주요 기능**
+
+### ✅ **룰세팅 기반 표준화 (NEW)**
+- `config/rules_config.json`로 **출력 템플릿 컬럼/우선순위/커버리지/유저플로우 질문 정책**을 고정
+- 결과 기록 컬럼을 **Web / (iOS+Android 통합)** 구조로 표준화:
+  - `web_result`, `app_result`
+
+### 🧾 **템플릿 기반 Excel 출력 (스타일 유지) (NEW)**
+- 기본 템플릿: `templates/QA_Testcase_Template_WebApp.xlsx`
+- `save_to_excel()`은 템플릿을 **복제한 뒤 데이터만 채워서** 헤더색/열너비/Freeze pane 등 스타일을 유지합니다.
+- 템플릿 2행에는 `web_result/app_result` 작성 예시가 포함되어 있습니다.
 
 ### 🚀 **NEW: 고급 5단계 파이프라인** ⭐
 - **단계 1**: 체크리스트 생성 (UI요소, 디자인플로우, 유저플로우 분석)
@@ -46,7 +56,7 @@ Figma 디자인을 분석하여 실무 중심의 테스트케이스를 자동으
 
 ```bash
 # 저장소 클론
-git clone https://github.com/your-org/figma-qa-testcase-generator.git
+git clone https://github.com/rowroh/figma-qa-testcase-generator.git
 cd figma-qa-testcase-generator
 
 # 가상환경 생성 및 활성화
@@ -61,7 +71,7 @@ pip install -r requirements.txt
 
 ```bash
 # .env 파일 생성
-cp config/.env.example .env
+cp config/env_example.txt .env
 
 # Figma API 토큰 설정
 echo "FIGMA_TOKEN=your_figma_token_here" >> .env
@@ -109,6 +119,13 @@ print(f"📂 출력: {result['output_files']['excel_path']}")
 # 기본 Excel 출력
 python src/main.py "https://www.figma.com/design/your-figma-url"
 
+# 룰세팅 지정 + 유저플로우 질문 출력
+python src/main.py "https://www.figma.com/design/your-figma-url" \
+  --rules "config/rules_config.json" \
+  --show-flow-questions \
+  --output "output/testcases.xlsx" \
+  --verbose
+
 # TestRail 가져오기용 CSV
 python src/main.py "https://figma.com/design/your-url" \
   --format testrail --output "testrail_import.csv"
@@ -142,6 +159,17 @@ generator.save_to_excel(testcases, "output/testcases.xlsx")
 
 > **💡 완전한 사용법 가이드: [docs/USER_GUIDE.md](docs/USER_GUIDE.md)**  
 > **🚀 빠른 데모: `python quick_demo.py`**
+
+### ✅ 결과 기록 규칙 (web_result / app_result)
+
+- `web_result`: Web 실행 결과 기록
+- `app_result`: iOS+Android 결과를 통합 기록
+- 권장 포맷 예시:
+  - `Pass`
+  - `Fail | BUG-1234 | 실제: ... | 기대: ...`
+  - `Blocked | DATA | 테스트 데이터 부족`
+
+자세한 규칙은 `docs/USER_GUIDE.md` 및 `config/rules_config.json`의 `result_recording_rules`를 참고하세요.
 
 ### **🔍 Figma 분석하기**
 
@@ -199,28 +227,25 @@ figma-qa-testcase-generator/
 ├── src/
 │   ├── analyzers/           # Figma 분석 엔진
 │   │   ├── figma_analyzer.py
-│   │   ├── keyword_analyzer.py
-│   │   └── ui_analyzer.py
 │   ├── generators/          # 테스트케이스 생성 엔진
 │   │   ├── testcase_generator.py
-│   │   ├── scenario_builder.py
-│   │   └── template_manager.py
 │   ├── utils/              # 유틸리티 함수들
-│   │   ├── figma_api.py
-│   │   ├── excel_utils.py
-│   │   └── validators.py
-│   └── mcp_server.py       # MCP 서버 통합
+│   │   └── rules_config.py
+│   ├── advanced_pipeline.py # 5단계 파이프라인
+│   └── main.py             # CLI 엔트리포인트
 ├── config/
-│   ├── .env.example
-│   ├── keywords.json       # 키워드 설정
-│   └── templates.yaml      # 테스트 템플릿
+│   ├── env_example.txt
+│   ├── keywords.json        # 키워드 설정
+│   └── rules_config.json    # 룰세팅(템플릿/우선순위/결과기록 규칙)
+├── templates/
+│   └── QA_Testcase_Template_WebApp.xlsx  # web/app 결과 컬럼 포함 템플릿
 ├── examples/
 │   ├── figma_samples/      # 예제 Figma 링크들
 │   ├── output_samples/     # 생성된 테스트케이스 샘플
 │   └── tutorials/          # 사용법 튜토리얼
 ├── docs/                   # 상세 문서
 ├── tests/                  # 테스트 코드
-└── templates/              # 테스트케이스 템플릿
+└── mcp_figma_server.py      # MCP 서버
 ```
 
 ---
@@ -287,20 +312,7 @@ figma-qa-testcase-generator/
 
 ### **테스트 템플릿 설정**
 
-```yaml
-# config/templates.yaml
-testcase_template:
-  priority_mapping:
-    critical: "P1"
-    high: "P2"
-    medium: "P3"
-  
-  sections:
-    - "정상 플로우"
-    - "예외 상황"
-    - "UI/UX 검증"
-    - "보안 테스트"
-```
+룰세팅/템플릿 컬럼/결과 기록 규칙은 `config/rules_config.json`에서 관리합니다.
 
 ---
 
@@ -375,7 +387,7 @@ MIT License - 자세한 내용은 [LICENSE](LICENSE) 파일 참조
 
 ```bash
 # 프로젝트 클론
-git clone https://github.com/your-org/figma-qa-testcase-generator.git
+git clone https://github.com/rowroh/figma-qa-testcase-generator.git
 
 # 빠른 테스트
 cd figma-qa-testcase-generator
