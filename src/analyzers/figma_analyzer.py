@@ -228,6 +228,7 @@ class FigmaAnalyzer:
                 for node in nodes:
                     traverse_nodes(node, depth)
             elif isinstance(nodes, dict):
+                node = nodes  # dict인 경우 nodes를 node로 할당
                 # 텍스트 노드 처리
                 if node.get('type') == 'TEXT' and 'characters' in node:
                     text = node['characters'].strip()
@@ -286,6 +287,7 @@ class FigmaAnalyzer:
                 for node in nodes:
                     traverse_nodes(node, depth)
             elif isinstance(nodes, dict):
+                node = nodes  # dict인 경우 nodes를 node로 할당
                 node_type = node.get('type')
                 node_name = node.get('name', '')
                 

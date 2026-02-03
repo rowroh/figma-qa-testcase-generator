@@ -707,4 +707,3 @@ class TestCaseGenerator:
             })
 
         return testcases
-
