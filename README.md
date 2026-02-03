@@ -4,7 +4,7 @@
 
 Figma 디자인을 분석하여 실무 중심의 테스트케이스를 자동으로 생성하는 AI 기반 도구입니다.
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)
+![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
 
@@ -48,6 +48,13 @@ Figma 디자인을 분석하여 실무 중심의 테스트케이스를 자동으
 - **실시간 처리**: 즉시 결과 확인 가능
 - **확장 가능**: 새로운 분석 도구 쉽게 추가
 
+### 🎯 **NEW: Notion PRD + Figma 통합 분석** ⭐⭐⭐
+- **다중 소스 통합**: Notion PRD와 Figma 디자인을 동시 분석
+- **완전한 커버리지**: 비즈니스 로직 + UI/UX + 계산 + 검증 + 에러 처리
+- **자동 요구사항 추출**: PRD에서 비즈니스 규칙, 검증 규칙, 계산 로직 자동 추출
+- **E2E 시나리오 생성**: 통합 분석 기반 End-to-End 시나리오 자동 생성
+- **성과**: 테스트케이스 **173% 증가** (15개 → 41개), P1 케이스 **286% 증가**
+
 ---
 
 ## 🚀 **빠른 시작**
@@ -79,7 +86,43 @@ echo "FIGMA_TOKEN=your_figma_token_here" >> .env
 
 ### **3. 기본 사용**
 
-#### **🚀 NEW: 고급 5단계 파이프라인 (추천)** ⭐
+#### **🎯 NEW: Notion PRD + Figma 통합 (최고 성능)** ⭐⭐⭐
+
+```bash
+# Notion PRD와 Figma를 동시 분석하여 완전한 테스트케이스 생성
+python generate_integrated_testcases.py
+
+# 스크립트 내에서 설정 필요:
+# - Notion PRD URL
+# - Figma Design URL
+
+# 결과:
+# ✅ 41개 테스트케이스 (Figma만 대비 173% 증가)
+# ✅ Notion PRD 기반: 비즈니스 규칙(5), UI 요구사항(5), 검증 규칙(4), 에러 처리(3), 계산 로직(3), 한도(3)
+# ✅ Figma 기반: UI/UX 테스트케이스(12)
+# ✅ 통합 시나리오: E2E, 비교, 극단값 테스트(3)
+# ✅ Excel, TestRail CSV, JSON, 분석 요약 출력
+```
+
+**실제 사용 예시 (Fixed Multiplier Mode):**
+```bash
+# 1. Notion PRD에서 요구사항 추출
+- 비즈니스 규칙: Multiplier 범위 (0.01x~100x)
+- 계산 로직: Position Size = Multiplier × Master Size
+- 검증 규칙: Min/Max 값, 소수점 입력
+- 에러 처리: 마진 부족 시 실패
+
+# 2. Figma에서 UI 분석
+- UI 요소: 8,833개
+- UI 패턴: navigation, form_input, modal, transaction 등
+
+# 3. 통합 결과
+- 총 41개 테스트케이스 생성
+- P1: 27개 (핵심), P2: 14개 (일반)
+- 커버리지: 비즈니스 로직 + UI/UX 완전 커버
+```
+
+#### **🚀 고급 5단계 파이프라인 (Figma만)** ⭐
 
 ```bash
 # 전체 파이프라인 실행
@@ -152,6 +195,22 @@ testcases = generator.generate_from_analysis(analysis)
 # Excel 저장
 generator.save_to_excel(testcases, "output/testcases.xlsx")
 ```
+
+---
+
+## 📊 **사용 방법 비교**
+
+| 방법 | 데이터 소스 | 테스트케이스 수 | 커버리지 | 추천 시나리오 |
+|------|------------|----------------|----------|--------------|
+| **Notion + Figma 통합** ⭐⭐⭐ | PRD + 디자인 | **41개** | 비즈니스+UI+계산+검증 | **실제 프로젝트 (최고 성능)** |
+| 고급 5단계 파이프라인 | Figma만 | 20~30개 | UI/UX + 체크리스트 | Figma만 있는 경우 |
+| 기본 CLI | Figma만 | 15~20개 | UI/UX 기본 | 빠른 프로토타입 |
+| Python API | 커스텀 | 변동 | 커스터마이징 가능 | 자동화/통합 |
+
+**💡 추천:**
+- ✅ **PRD + Figma 있음** → `generate_integrated_testcases.py` 사용 (**173% 더 많은 케이스**)
+- ⚡ **Figma만 있음** → `src/advanced_pipeline.py` 또는 `src/main.py` 사용
+- 🔧 **자동화 필요** → Python API 직접 사용
 
 ---
 
@@ -319,7 +378,19 @@ figma-qa-testcase-generator/
 ## 📈 **실제 성과**
 
 ### **프로젝트 적용 사례**
-- **X OAuth 연동**: 24개 → 35개 테스트케이스 (중복 제거 + 누락 기능 추가)
+
+#### **🎯 Fixed Multiplier Mode (Notion PRD + Figma 통합)** ⭐ NEW
+- **데이터 소스**: Notion PRD + Figma 디자인
+- **테스트케이스**: Figma만 **15개** → 통합 **41개** (**+173% 증가**)
+- **P1 핵심 케이스**: **7개** → **27개** (**+286% 증가**)
+- **커버리지**: 
+  - Figma만: UI/UX 패턴만
+  - 통합: 비즈니스 로직 + UI/UX + 계산 + 검증 + 에러 처리 (**완전 커버**)
+- **자동 추출 요구사항**: 비즈니스 규칙(5), UI 요구사항(5), 검증 규칙(4), 에러 처리(3), 계산 로직(3), 한도(3)
+- **통합 시나리오**: E2E 플로우, 모드 비교, 극단값 테스트 자동 생성
+
+#### **X OAuth 연동 (Figma만)**
+- **테스트케이스**: 24개 → 35개 (중복 제거 + 누락 기능 추가)
 - **TO-BE 커버리지**: 30% → 100% 달성
 - **테스트 효율성**: 수동 작성 대비 **70% 시간 단축**
 
@@ -327,6 +398,7 @@ figma-qa-testcase-generator/
 - **누락 시나리오 0%**: AI 분석으로 놓치기 쉬운 케이스 자동 발견
 - **일관된 우선순위**: 리스크 기반 체계적 분류
 - **표준화된 구조**: 팀 간 테스트케이스 품질 균일화
+- **다중 소스 통합**: PRD + Figma 통합으로 **완전한 테스트 커버리지** 달성
 
 ---
 
